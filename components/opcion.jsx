@@ -10,7 +10,6 @@ const Opcion = ({
   question,
   dis,
 }) => {
-  console.log(dis);
   const [select, setSelect] = useState(0);
   const toggle = () => {
     setSelect((value) => !value);

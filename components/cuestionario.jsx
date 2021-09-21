@@ -4,34 +4,43 @@ import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { QuestionarioStyles } from "../styles/styles";
 import Icon from "react-native-vector-icons/Entypo";
 import Opcion from "../components/opcion";
+import { useDispatch } from "react-redux";
+import { setAnswer, setName_ } from "../redux/actions";
 
-const Cuestionario = ({ nextView, nombre, pregunta, opciones },navigation) => {
+const Cuestionario = ({ nextView, pregunta, opciones, navigation }) => {
   const [nameP, setName] = useState("");
   const [values, setValues] = useState(null);
-
   const functionToPass = (obj) => setValues(() => obj);
+  const dispatch = useDispatch();
 
-  const goNextView = () => {
-    if (nombre) {
-      if (nameP === "") {
-        alert("Debe introducir su nombre");
-      } else {
-        navigation.navigate(nextView);
-      }
+  const goSecondView = () => {
+    if (nameP === "") {
+      alert("Debe introducir su nombre");
     } else {
+      dispatch(setName_(nameP));
+      dispatch(setAnswer(values));
       navigation.navigate(nextView);
     }
+  };
+
+  const goNextView = () => {
+    dispatch(setAnswer(values));
+    navigation.navigate(nextView);
   };
   return (
     <View style={QuestionarioStyles.container}>
       <View style={QuestionarioStyles.nombreRow}>
-        <Text style={QuestionarioStyles.nombre}>Nombre:</Text>
-        <TextInput
-          placeholder="Nombre"
-          onChangeText={(text) => setName(text)}
-          value={nameP}
-          style={QuestionarioStyles.nombreInput}
-        ></TextInput>
+        {nextView == "Second" ? (
+          <Text style={QuestionarioStyles.nombre}>Nombre:</Text>
+        ) : null}
+        {nextView == "Second" ? (
+          <TextInput
+            placeholder="Nombre"
+            onChangeText={(name) => setName(name)}
+            value={nameP}
+            style={QuestionarioStyles.nombreInput}
+          ></TextInput>
+        ) : null}
       </View>
       <Text style={QuestionarioStyles.pregunta1}>{pregunta}</Text>
       {opciones.map((pregunta, idx) => (
@@ -43,6 +52,7 @@ const Cuestionario = ({ nextView, nombre, pregunta, opciones },navigation) => {
           switchStyle={QuestionarioStyles.switch1}
           question={pregunta}
           functionPassed={functionToPass}
+          dis={values ? true : false}
         />
       ))}
       <TouchableOpacity
@@ -50,7 +60,7 @@ const Cuestionario = ({ nextView, nombre, pregunta, opciones },navigation) => {
           values === null ? true : values.value === false ? true : false
         }
         style={QuestionarioStyles.button}
-        onPress={goNextView}
+        onPress={nextView === "Second" ? goSecondView : goNextView}
       >
         <Icon name="chevron-thin-right" style={QuestionarioStyles.icon}></Icon>
       </TouchableOpacity>
@@ -59,5 +69,3 @@ const Cuestionario = ({ nextView, nombre, pregunta, opciones },navigation) => {
 };
 
 export default Cuestionario;
-
-// https://www.npmjs.com/package/react-native-vector-icons
